@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	<!-- struts编码设置 -->
+	<constant name="struts.i18n.encoding" value="gbk"></constant>
+	<package name="show" namespace="/" extends="struts-default">
+	<!-- 声明拦截器 -->
+	<interceptors>
+		<!-- 注册拦截器 -->
+		<interceptor name="loginCheck" class="com.Interceptor.loginCheck"></interceptor>
+		<!-- 注册拦截器栈 -->
+		<interceptor-stack name="myInterceptor">
+			<interceptor-ref name="loginCheck"></interceptor-ref>
+			<!-- 默认的拦截器栈，不能忽视，因为Struts2中依赖的很多拦截器存在于此栈中 -->
+			<interceptor-ref name="defaultStack"></interceptor-ref>
+		</interceptor-stack>
+	</interceptors>
+	<global-results>
+			<result name="unlogin" type="redirectAction">
+				<param name="namespace">/</param>
+				<param name="ActionName">register1</param>
+			</result>
+	</global-results>
+	
+		<!-- 首页展示，显示所有菜品 -->
+		<action name="showMeal" class="mealseriesAction" method="findAllMS">
+			<param name="pageSize">6</param>
+			<result name="success">
+				/show.jsp
+			</result>
+		</action>
+		
+		<!-- 显示所有可以的管理菜品 -->
+		<action name="ManagerMeal" class="managerMealAction" method="findAllMSS">
+			<param name="pageSize">6</param>
+			<result name="success">
+				/managerMeal.jsp
+			</result>
+		</action>
+		
+		<!-- 根据条件（菜系或者搜素）展示菜品 -->
+		<action name="ByParamMeal" class="mealseriesAction" method="findByParam">
+			<param name="pageSize">6</param>
+			<result name="success">
+				/show.jsp
+			</result>
+		</action>
+		
+		<!-- 根据条件（菜系或者搜素）展示可以管理的菜品 -->
+		<action name="ByParamMeal1" class="managerMealAction" method="findByParam1">
+			<param name="pageSize">6</param>
+			<result name="success">
+				/managerMeal.jsp
+			</result>
+		</action>
+		
+		<!-- 查询菜品详情 -->
+		<action name="details" class="mealseriesAction" method="findById">
+			<result name="success">
+				/details.jsp
+			</result>
+		</action>
+		
+		<!-- 点击订购，转到购物车页面 -->
+		<action name="cart" class="cartAction" method="addCart">
+		
+		<!-- 引入拦截器 -->
+			<interceptor-ref name="myInterceptor"></interceptor-ref>
+			<result name="success">
+				/shopCart.jsp
+			</result>
+		</action>
+		
+		<!-- 删除购物车里的产品 -->
+		<action name="delCartById" class="cartAction" method="delCartById">
+			<result name="success">
+				/shopCart.jsp
+			</result>
+		</action>
+		
+		<!-- 清空购物车 -->
+		<action name="clearCart" class="cartAction" method="clearCart">
+			<result name="success">
+				/shopCart.jsp
+			</result>
+		</action>
+		
+		<!-- 购物车页面修改购买数量 -->
+		<action name="updateSelectedQuantity" class="cartAction" method="updateSelectedQuantity">
+			<result name="success">
+				/shopCart.jsp
+			</result>
+		</action>
+		
+		<!-- 生成订单，成功的话转到购物车界面 -->
+		<action name="addOrders" class="orderAction" method="addOrders">
+			<result name="success">
+				/shopCart.jsp
+			</result>
+		</action>
+		
+		<!-- 查询我的订单 -->
+		<action name="findOrdersByUserId" class="orderAction" method="findOrdersByUserId">
+			<result name="success">
+				/MyOrders.jsp
+			</result>
+		</action>
+		
+		<!-- 修改订单（主要是管理员处理订单，更改状态） -->
+		<action name="updateOrder" class="orderAction" method="updateOrder">
+			<result name="success" type="redirectAction">
+				findAllOrders
+			</result>
+		</action>
+		
+		<!-- 删除订单 -->
+		<action name="deleteOrders" class="orderAction" method="deleteOrders">
+			<result name="success" type="redirectAction">
+				findOrdersByUserId
+			</result>
+		</action>
+		
+		<!-- 订单详情 -->
+		<action name="MyOrdersDetails" class="orderAction" method="MyOrdersDetails">
+			<result name="success">
+				/myOrdersDetails.jsp
+			</result>
+		</action>
+	</package>
+
+	<package name="login" namespace="/" extends="struts-default">
+		<!-- 登陆验证 -->
+		<action name="login" class="userAction" method="check">
+			<result name="success" type="redirectAction">
+				showMeal
+			</result>
+		</action>
+		
+		<!-- 不是注册用户不能订购，先注册 -->
+		<action name="register1" class="registerAction">
+			<result name="success">
+			/register.jsp
+			</result>
+		</action>
+		
+		<!-- 注册 -->
+		<action name="register" class="userAction" method="addUser">
+			<result name="success" type="redirectAction">
+				showMeal
+			</result>
+		</action>
+		
+		<!-- 修改用户，成功之后转到首页 -->
+		<action name="updateUser" class="userAction" method="updateUser">
+			<result name="success" type="redirectAction">
+				showMeal
+			</result>
+		</action>
+		
+		<!-- 注销 -->
+		<action name="loginout" class="userAction" method="logOut">
+			<result name="show" type="redirectAction">
+				showMeal
+			</result>
+		</action>
+		
+		<!-- 添加菜品界面下拉列表获取菜系信息 -->
+		<action name="doAddMeal" class="mealAction" method="doAddMeal">
+			<result name="success" >
+				/addMeal.jsp
+			</result>
+		</action>
+		
+		<!-- 添加菜品成功后转到首页 -->
+		<action name="addMeal" class="mealAction" method="addMeal">
+			<result name="success" type="redirectAction">
+				showMeal
+			</result>
+		</action>
+		
+		<!-- 修改菜品信息 之前，先根据id查询出菜品-->
+		<action name="findMealById" class="mealAction" method="findById">
+			<result name="success">
+				/updateMeal1.jsp
+			</result>
+		</action>
+		
+		<!-- 修改菜品信息 -->
+		<action name="updateMeal" class="mealAction" method="updateMeal">
+			<result name="success" type="redirectAction">
+				ManagerMeal
+			</result>
+		</action>
+		
+		<!-- 删除菜品 -->
+		<action name="delMeal" class="mealAction" method="delMeal">
+			<result name="success" type="redirectAction">
+				ManagerMeal
+			</result>
+		</action>
+		
+		<!-- 分页查询所有订单 -->
+		<action name="findAllOrders" class="orderAction" method="findAllOrders">
+			<param name="pageSize">6</param>
+			<result name="success">
+				/managerOrders.jsp
+			</result>
+		</action>
+		
+		<!-- 根据条件查询订单信息(状态和搜索的订单号) -->
+		<action name="findOrdersByParam" class="orderAction" method="findOrdersByParam">
+			<param name="pageSize">6</param>
+			<result name="success">
+				/managerOrders.jsp
+			</result>
+		</action>
+		
+	</package>
+</struts>
